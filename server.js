@@ -1,15 +1,13 @@
 const express = require('express')
 const bodyParser = require('body-parser')
 const cors = require('cors')
-const mongoose = require('mongoose')
 const dotenv = require('dotenv')
 
 // load environement configuration
 dotenv.config()
 
-mongoose.connect(process.env.MONGO_LAB_URI, { useUnifiedTopology: true, useNewUrlParser: true })
-
 const app = express()
+const UserService = require('./services/user-service')
 
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }))
@@ -24,8 +22,11 @@ app.post('/api/exercise/users', (req, res) => {
 
 })
 
-app.post('/api/exercise/new-user', (req, res) => {
-
+app.post('/api/exercise/new-user', (req, res, next) => {
+  UserService.createNewUser(req, (err, data) => {
+    if (err) next(err)
+    res.json(data)
+  })
 })
 
 app.post('/api/exercise/add', (req, res) => {
@@ -40,6 +41,8 @@ app.use((req, res, next) => {
 // Error Handling middleware
 app.use((err, req, res, next) => {
   let errCode, errMessage
+
+  console.log('error', err)
 
   if (err.errors) {
     // mongoose validation error

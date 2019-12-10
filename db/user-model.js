@@ -1,30 +1,44 @@
 'use strict'
 
+const shortid = require('shortid')
+
 module.exports = (mongoose) => {
   const Schema = mongoose.Schema
-  const userSchema = new Schema({ userName: String, _id: String })
-  this.User = mongoose.model('User', userSchema)
+  const userSchema = new Schema({
+    username: String,
+    exercises: [{ description: String, duration: Number, date: Date }],
+    _id: { type: String, default: shortid.generate }
+  })
 
-  const addUser = (userName, callback) => {
-    this.User.create({ userName: userName, _id: 'Y0dEezg' }, (err, user) => {
+  const User = mongoose.model('User', userSchema)
+
+  const addUser = (username, callback) => {
+    User.create({ username }, (err, user) => {
       if (err) return callback(err)
       callback(null, user)
     })
   }
 
-  const getUser = (userName, callback) => {
-    this.User.findOne({ userName: userName }, (err, user) => {
+  const getUserByName = (username, callback) => {
+    User.findOne({ username }, (err, user) => {
+      if (err) return callback(err)
+      callback(null, user)
+    })
+  }
+
+  const getUserById = (userId, callback) => {
+    User.findById(userId, (err, user) => {
       if (err) return callback(err)
       callback(null, user)
     })
   }
 
   const getUsers = (callback) => {
-    this.User.find({}, (err, users) => {
+    User.find({}, (err, users) => {
       if (err) return callback(err)
       callback(null, users)
     })
   }
 
-  return { addUser, getUser, getUsers }
+  return { addUser, getUserById, getUserByName, getUsers }
 }
