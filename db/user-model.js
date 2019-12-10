@@ -7,7 +7,7 @@ module.exports = (mongoose) => {
 
   // User Schema + Model
   const userSchema = new Schema({
-    username: { type: String, required: true },
+    username: { type: String, required: true, unique: true },
     exercises: [{
       description: { type: String, required: true },
       duration: { type: Number, required: true },
@@ -46,6 +46,30 @@ module.exports = (mongoose) => {
     })
   }
 
+  const findUsers = ({ userId, from, to, limit }, callback) => {
+    User.findById(userId).select('-__v -exercises._id').exec((err, user) => {
+      if (err) return callback(err)
+
+      const exercises = user.get('exercises')
+      let result = [...exercises]
+
+      if (result.length && (from || to)) {
+        result = result.filter((exercise) => {
+          if (from && !to) return exercise.date >= new Date(from)
+          if (!from && to) return exercise.date <= new Date(to)
+          return exercise.date >= new Date(from) && exercise.date <= new Date(to)
+        })
+      }
+
+      if (+limit && result.length) {
+        result = result.slice(0, limit)
+      }
+
+      user.exercises = result
+      callback(null, user)
+    })
+  }
+
   // exercise = { userId, description, duration, date }
   // callback = (err, data) => {}
   const insertExercise = (userDocument, exercise, callback) => {
@@ -57,5 +81,5 @@ module.exports = (mongoose) => {
     })
   }
 
-  return { addUser, getUserById, getUserByName, getUsers, insertExercise }
+  return { addUser, getUserById, getUserByName, getUsers, insertExercise, findUsers }
 }

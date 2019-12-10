@@ -25,6 +25,13 @@ app.get('/api/exercise/users', (req, res, next) => {
   })
 })
 
+app.get('/api/exercise/log', (req, res, next) => {
+  UserService.searchUsers(req, (err, result) => {
+    if (err) return next(err)
+    res.json(result)
+  })
+})
+
 app.post('/api/exercise/new-user', (req, res, next) => {
   UserService.createNewUser(req, (err, user) => {
     if (err) return next(err)

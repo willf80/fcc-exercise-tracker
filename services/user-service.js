@@ -58,4 +58,19 @@ const addExercise = (request, callback) => {
   })
 }
 
-module.exports = { createNewUser, getAllUsers, addExercise }
+const searchUsers = (request, callback) => {
+  const params = request.query
+  const { userId } = params
+
+  if (!userId) {
+    const error = { message: 'unknow userId' }
+    return callback(error)
+  }
+
+  UserService.findUsers(params, (err, result) => {
+    if (err) return callback(err)
+    callback(null, result)
+  })
+}
+
+module.exports = { createNewUser, getAllUsers, addExercise, searchUsers }
