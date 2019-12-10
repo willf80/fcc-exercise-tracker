@@ -28,4 +28,34 @@ const getAllUsers = (callback) => {
   })
 }
 
-module.exports = { createNewUser, getAllUsers }
+const addExercise = (request, callback) => {
+  const exercise = request.body
+
+  const { date } = exercise
+  if (!date || !(/^\d{4}-\d{2}-\d{2}$/.test(date.trim()))) {
+    exercise.date = new Date()
+  } else {
+    exercise.date = new Date(date)
+  }
+
+  UserService.getUserById(exercise.userId, (err, user) => {
+    if (err || !user) {
+      const error = { message: 'unknow _id' }
+      return callback(error)
+    }
+
+    UserService.insertExercise(user, exercise, (err, newUser) => {
+      if (err) return callback(err)
+      const data = {
+        _id: newUser.get('_id'),
+        username: newUser.get('username'),
+        description: exercise.description,
+        duration: exercise.duration,
+        date: new Date(exercise.date).toUTCString()
+      }
+      callback(null, data)
+    })
+  })
+}
+
+module.exports = { createNewUser, getAllUsers, addExercise }

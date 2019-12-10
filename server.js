@@ -20,20 +20,23 @@ app.get('/', (req, res) => {
 
 app.get('/api/exercise/users', (req, res, next) => {
   UserService.getAllUsers((err, allUsers) => {
-    if (err) next(err)
+    if (err) return next(err)
     res.json(allUsers)
   })
 })
 
 app.post('/api/exercise/new-user', (req, res, next) => {
   UserService.createNewUser(req, (err, user) => {
-    if (err) next(err)
+    if (err) return next(err)
     res.json(user)
   })
 })
 
-app.post('/api/exercise/add', (req, res) => {
-
+app.post('/api/exercise/add', (req, res, next) => {
+  UserService.addExercise(req, (err, exercise) => {
+    if (err) return next(err)
+    res.json(exercise)
+  })
 })
 
 // Not found middleware
