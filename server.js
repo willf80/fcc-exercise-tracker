@@ -18,14 +18,17 @@ app.get('/', (req, res) => {
   res.sendFile(`${__dirname}/views/index.html`)
 })
 
-app.post('/api/exercise/users', (req, res) => {
-
+app.get('/api/exercise/users', (req, res, next) => {
+  UserService.getAllUsers((err, allUsers) => {
+    if (err) next(err)
+    res.json(allUsers)
+  })
 })
 
 app.post('/api/exercise/new-user', (req, res, next) => {
-  UserService.createNewUser(req, (err, data) => {
+  UserService.createNewUser(req, (err, user) => {
     if (err) next(err)
-    res.json(data)
+    res.json(user)
   })
 })
 
@@ -55,8 +58,7 @@ app.use((err, req, res, next) => {
     errCode = err.status || 500
     errMessage = err.message || 'Internal Server Error'
   }
-  res.status(errCode).type('txt')
-    .send(errMessage)
+  res.status(errCode).type('txt').send(errMessage)
 })
 
 const listener = app.listen(process.env.PORT, () => {

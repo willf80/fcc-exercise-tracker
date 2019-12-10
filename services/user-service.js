@@ -21,4 +21,11 @@ const createNewUser = (request, callback) => {
   })
 }
 
-module.exports = { createNewUser }
+const getAllUsers = (callback) => {
+  UserService.getUsers((err, users) => {
+    if (err) return callback(err)
+    callback(null, users)
+  })
+}
+
+module.exports = { createNewUser, getAllUsers }

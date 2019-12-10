@@ -34,7 +34,7 @@ module.exports = (mongoose) => {
   }
 
   const getUsers = (callback) => {
-    User.find({}, (err, users) => {
+    User.find({}).select('username _id').exec((err, users) => {
       if (err) return callback(err)
       callback(null, users)
     })
